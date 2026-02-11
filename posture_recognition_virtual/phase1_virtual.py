@@ -17,6 +17,10 @@ os.makedirs(PROCESSED_DATA_PATH, exist_ok=True)
 X = []
 y = []
 
+calib_ref = None
+
+calib_ref = None
+
 for posture in POSTURES:
     print(f"\nProcessing posture: {posture}")
 
@@ -26,29 +30,45 @@ for posture in POSTURES:
     print(f"Loaded {len(df)} samples")
 
     # Normalize
+    # Normalize
     df["Ax"] = normalize_signal(df["Ax"])
     df["Ay"] = normalize_signal(df["Ay"])
     df["Az"] = normalize_signal(df["Az"])
 
-    # Filter
+# Filter FIRST
     df["Ax_f"] = low_pass_filter(df["Ax"])
     df["Ay_f"] = low_pass_filter(df["Ay"])
     df["Az_f"] = low_pass_filter(df["Az"])
 
-    # Calibration
+# Compute calibration using filtered signals
     if posture == "standing":
         calib_ref = calibrate(df)
         print("Calibration reference:", calib_ref)
+
+# Apply calibration correction on filtered signals
+    df["Ax_f"] = df["Ax_f"] - calib_ref["Ax_ref"]
+    df["Ay_f"] = df["Ay_f"] - calib_ref["Ay_ref"]
+    df["Az_f"] = df["Az_f"] - calib_ref["Az_ref"]
+
 
     # Sliding window
     windows = sliding_window(df)
     print(f"Created {len(windows)} windows")
 
-    # Feature extraction
     for w in windows:
         features = extract_features(w)
         X.append(features)
         y.append(posture)
+
+
+    windows = sliding_window(df)
+    print(f"Created {len(windows)} windows")
+
+    for w in windows:
+        features = extract_features(w)
+        X.append(features)
+        y.append(posture)
+
 
 X = np.array(X)
 y = np.array(y)
