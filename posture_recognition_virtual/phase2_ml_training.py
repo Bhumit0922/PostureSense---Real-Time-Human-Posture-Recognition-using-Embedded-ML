@@ -8,19 +8,11 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-# ==============================
-# 1️⃣ Load Dataset
-# ==============================
-
 X = np.load("data/processed/X.npy")
 y = np.load("data/processed/y.npy")
 
 print("Loaded feature matrix:", X.shape)
 print("Loaded labels:", y.shape)
-
-# ==============================
-# 2️⃣ Train-Test Split
-# ==============================
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y,
@@ -32,18 +24,10 @@ X_train, X_test, y_train, y_test = train_test_split(
 print("Training samples:", X_train.shape[0])
 print("Testing samples:", X_test.shape[0])
 
-# ==============================
-# 3️⃣ Feature Scaling
-# ==============================
-
 scaler = StandardScaler()
 
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
-
-# ==============================
-# 4️⃣ Hyperparameter Tuning (Optional but Recommended)
-# ==============================
 
 print("\n🔍 Performing Hyperparameter Tuning...")
 
@@ -65,30 +49,14 @@ best_model = grid_search.best_estimator_
 
 print("✅ Best Parameters Found:", grid_search.best_params_)
 
-# ==============================
-# 5️⃣ Cross Validation Score
-# ==============================
-
 cv_scores = cross_val_score(best_model, X_train, y_train, cv=5)
 
 print("\nCross Validation Accuracy: {:.2f}%".format(cv_scores.mean() * 100))
 
-# ==============================
-# 6️⃣ Final Training
-# ==============================
-
 best_model.fit(X_train, y_train)
 print("✅ Random Forest training completed")
 
-# ==============================
-# 7️⃣ Prediction
-# ==============================
-
 y_pred = best_model.predict(X_test)
-
-# ==============================
-# 8️⃣ Evaluation
-# ==============================
 
 accuracy = accuracy_score(y_test, y_pred)
 
@@ -103,10 +71,6 @@ print(classification_report(y_test, y_pred))
 print("Confusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
 
-# ==============================
-# 9️⃣ Feature Importance
-# ==============================
-
 print("\n📊 Feature Importance Analysis")
 
 importances = best_model.feature_importances_
@@ -117,10 +81,6 @@ plt.bar(range(len(importances)), importances)
 plt.xlabel("Feature Index")
 plt.ylabel("Importance")
 plt.show()
-
-# ==============================
-# 🔟 Save Model & Scaler
-# ==============================
 
 os.makedirs("models/trained", exist_ok=True)
 
